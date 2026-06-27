@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFLSHC 202401 · 从零搭建聊天×AI 网站</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #0a0a1a;
+            color: #eef4ff;
+            padding: 30px 20px;
+            line-height: 1.8;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 {
+            font-size: 36px;
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .subtitle { color: #888; font-size: 16px; margin-bottom: 30px; }
+        .toc {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 12px;
+            padding: 20px 28px;
+            margin-bottom: 30px;
+        }
+        .toc h2 { color: #ffd700; font-size: 18px; margin-bottom: 12px; }
+        .toc a { color: #ffd700; text-decoration: none; display: inline-block; margin: 4px 16px 4px 0; font-size: 14px; }
+        .toc a:hover { text-decoration: underline; }
+        .step {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+        }
+        .step h2 {
+            color: #ffd700;
+            font-size: 22px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step h2 .badge {
+            background: rgba(255,215,0,0.15);
+            color: #ffd700;
+            font-size: 12px;
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+        .step h3 { color: #ffd700; font-size: 17px; margin: 18px 0 10px; }
+        .step p { color: #c8d0dc; margin-bottom: 10px; }
+        .step ul, .step ol { padding-left: 24px; color: #c8d0dc; margin-bottom: 12px; }
+        .step li { margin-bottom: 4px; }
+        .step code {
+            background: rgba(255,215,0,0.08);
+            color: #ffd700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        .step .code-block {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 16px 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 12px 0;
+            border: 1px solid #1e293b;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .step .code-block .comment { color: #64748b; }
+        .step .code-block .keyword { color: #c084fc; }
+        .step .code-block .string { color: #34d399; }
+        .step .code-block .function { color: #60a5fa; }
+        .step .tip {
+            background: rgba(255,215,0,0.06);
+            border-left: 3px solid #ffd700;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0;
+            color: #c8d0dc;
+            font-size: 14px;
+        }
+        .step .warning {
+            background: rgba(220,53,69,0.08);
+            border-left: 3px solid #dc3545;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0;
+            color: #f8d7da;
+            font-size: 14px;
+        }
+        .step .success {
+            background: rgba(40,167,69,0.08);
+            border-left: 3px solid #28a745;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0;
+            color: #d4edda;
+            font-size: 14px;
+        }
+        .step table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+        .step th, .step td {
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 8px 14px;
+            text-align: left;
+        }
+        .step th {
+            background: rgba(255,215,0,0.06);
+            color: #ffd700;
+        }
+        .step td { color: #c8d0dc; }
+        .step .btn-copy {
+            background: rgba(255,215,0,0.12);
+            border: 1px solid rgba(255,215,0,0.2);
+            color: #ffd700;
+            padding: 4px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            float: right;
+            transition: all 0.2s;
+        }
+        .step .btn-copy:hover {
+            background: rgba(255,215,0,0.2);
+        }
+        .step .btn-copy.copied {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        .footer {
+            text-align: center;
+            color: #555;
+            font-size: 13px;
+            padding: 30px 0 10px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .step { padding: 20px; }
+            .step .code-block { font-size: 12px; padding: 12px; }
+            h1 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🚀 从零搭建聊天×AI 网站</h1>
+    <p class="subtitle">使用 GitHub Pages + GitHub Issues + 浏览器 AI 能力 · 零服务器成本</p>
+
+    <!-- ===== 目录 ===== -->
+    <div class="toc">
+        <h2>📋 本文目录</h2>
+        <a href="#step1">1. 注册 GitHub 账号</a>
+        <a href="#step2">2. 创建仓库</a>
+        <a href="#step3">3. 获取 Token</a>
+        <a href="#step4">4. 项目文件结构</a>
+        <a href="#step5">5. 核心代码详解</a>
+        <a href="#step6">6. 部署到 GitHub Pages</a>
+        <a href="#step7">7. 本地开发与调试</a>
+        <a href="#step8">8. 添加 AI 对话能力</a>
+        <a href="#step9">9. 语音输入（浏览器自带）</a>
+        <a href="#step10">10. 常见问题排查</a>
+    </div>
+
+    <!-- ===== STEP 1 ===== -->
+    <div class="step" id="step1">
+        <h2>1. 注册 GitHub 账号 <span class="badge">第一步</span></h2>
+        <p>如果你还没有 GitHub 账号，请按以下步骤注册：</p>
+        <ol>
+            <li>访问 <a href="https://github.com" target="_blank" style="color:#ffd700;">github.com</a></li>
+            <li>点击右上角 <strong>Sign up</strong></li>
+            <li>填写用户名、邮箱、密码</li>
+            <li>完成邮箱验证</li>
+            <li>登录后进入 <a href="https://github.com" target="_blank" style="color:#ffd700;">GitHub 首页</a></li>
+        </ol>
+        <div class="tip">💡 <strong>用户名建议：</strong>使用英文或数字组合，例如 <code>yourname</code> 或 <code>yourname-chat</code></div>
+    </div>
+
+    <!-- ===== STEP 2 ===== -->
+    <div class="step" id="step2">
+        <h2>2. 创建仓库 <span class="badge">第二步</span></h2>
+        <p>仓库（Repository）是存放你所有代码的地方。</p>
+        <ol>
+            <li>点击 GitHub 右上角的 <strong>+</strong> 号，选择 <strong>New repository</strong></li>
+            <li>填写 Repository name，例如 <code>my-chat-app</code></li>
+            <li>选择 <strong>Public</strong>（公开仓库，免费）</li>
+            <li>勾选 <strong>Add a README file</strong></li>
+            <li>点击 <strong>Create repository</strong></li>
+        </ol>
+        <div class="tip">💡 <strong>仓库名建议：</strong>使用 <code>用户名.github.io</code> 的格式（如 <code>yourname.github.io</code>），这样部署后可以直接通过 <code>https://yourname.github.io</code> 访问。</div>
+    </div>
+
+    <!-- ===== STEP 3 ===== -->
+    <div class="step" id="step3">
+        <h2>3. 获取 Personal Access Token <span class="badge">第三步</span></h2>
+        <p>Token 是你的网站访问 GitHub 数据的钥匙。</p>
+        <ol>
+            <li>点击右上角头像 → <strong>Settings</strong></li>
+            <li>左侧菜单最下方 → <strong>Developer settings</strong></li>
+            <li>点击 <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong></li>
+            <li>点击 <strong>Generate new token</strong> → <strong>Generate new token (classic)</strong></li>
+            <li>填写 Note：<code>我的聊天网站</code></li>
+            <li>设置 <strong>Expiration</strong>：建议 <code>No expiration</code>（无过期）或 <code>90 days</code></li>
+            <li>勾选权限：<strong>repo</strong>（全部勾选）</li>
+            <li>滚动到底部点击 <strong>Generate token</strong></li>
+            <li>⚠️ <strong>立即复制 Token！</strong> 页面刷新后就不再显示</li>
+        </ol>
+        <div class="warning">⚠️ <strong>安全警告：</strong>Token 相当于密码，不要分享给任何人，也不要上传到公开仓库！</div>
+        <div class="tip">💡 <strong>Token 格式：</strong>类似 <code>ghp_xxxxxxxxxxxxxxxxxxxx</code></div>
+    </div>
+
+    <!-- ===== STEP 4 ===== -->
+    <div class="step" id="step4">
+        <h2>4. 项目文件结构 <span class="badge">第四步</span></h2>
+        <p>你的网站需要以下核心文件：</p>
+        <div class="code-block">
+📁 my-chat-app/
+├── 📄 index.html          # 登录/首页
+├── 📄 chat.html           # 聊天主页面（核心）
+├── 📄 config.js           # GitHub 配置（包含 Token）
+├── 📄 style.css           # 样式文件
+└── 📄 README.md           # 项目说明（可选）
+        </div>
+        <div class="tip">💡 <strong>核心文件说明：</strong><br>
+        <code>config.js</code> — 存储你的 GitHub 用户名、仓库名、Token<br>
+        <code>chat.html</code> — 所有聊天逻辑（发送消息、加载消息、AI 对话）<br>
+        <code>index.html</code> — 用户登录入口</div>
+    </div>
+
+    <!-- ===== STEP 5 ===== -->
+    <div class="step" id="step5">
+        <h2>5. 核心代码详解 <span class="badge">第五步</span></h2>
+
+        <h3>5.1 config.js — 配置文件</h3>
+        <p>将以下代码复制到 <code>config.js</code> 中，替换成你的信息：</p>
+        <div class="code-block" id="configCode">
+<span class="comment">// config.js — 请替换成你的信息</span>
+window.CONFIG = {
+    GITHUB_USERNAME: '<span style="color:#34d399;">你的GitHub用户名</span>',
+    GITHUB_REPO: '<span style="color:#34d399;">你的仓库名</span>',
+    GITHUB_TOKEN: '<span style="color:#34d399;">你的Personal Access Token</span>'
+};
+        </div>
+        <button class="btn-copy" onclick="copyCode('configCode')">📋 复制</button>
+
+        <h3>5.2 用户登录系统 (index.html 核心)</h3>
+        <div class="code-block" id="loginCode">
+<span class="comment">&lt;!-- index.html 登录验证核心 --&gt;</span>
+&lt;script&gt;
+async function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    <span class="comment">// 从 GitHub Issues 读取用户数据</span>
+    const url = `https://api.github.com/repos/${window.CONFIG.GITHUB_USERNAME}/${window.CONFIG.GITHUB_REPO}/issues?labels=user&state=open`;
+    const res = await fetch(url, {
+        headers: { 'Authorization': `token ${window.CONFIG.GITHUB_TOKEN}` }
+    });
+    const issues = await res.json();
+    
+    <span class="comment">// 查找匹配的用户</span>
+    for (const issue of issues) {
+        const match = issue.body.match(/```json\n([\s\S]*?)\n```/);
+        if (match) {
+            const user = JSON.parse(match[1]);
+            if (user.username === username && user.password === password) {
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                window.location.href = 'chat.html';
+                return;
+            }
+        }
+    }
+    alert('用户名或密码错误');
+}
+&lt;/script&gt;
+        </div>
+        <button class="btn-copy" onclick="copyCode('loginCode')">📋 复制</button>
+
+        <h3>5.3 发送消息 (chat.html 核心)</h3>
+        <div class="code-block" id="sendCode">
+<span class="comment">// chat.html — 发送消息到 GitHub Issues</span>
+async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const content = input.value.trim();
+    if (!content) return;
+    
+    const messageData = {
+        id: `msg_${Date.now()}`,
+        roomId: currentRoom.id,
+        sender: currentUser.username,
+        content: content,
+        timestamp: new Date().toISOString()
+    };
+    
+    <span class="comment">// 存储到 GitHub Issues</span>
+    const issueBody = `聊天消息\n\`\`\`json\n${JSON.stringify(messageData, null, 2)}\n\`\`\``;
+    await fetch(`https://api.github.com/repos/${window.CONFIG.GITHUB_USERNAME}/${window.CONFIG.GITHUB_REPO}/issues`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `token ${window.CONFIG.GITHUB_TOKEN}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            title: `Message: ${messageData.id}`,
+            body: issueBody,
+            labels: ['chatmessage']
+        })
+    });
+    
+    input.value = '';
+    loadMessages(); <span class="comment">// 刷新消息列表</span>
+}
+        </div>
+        <button class="btn-copy" onclick="copyCode('sendCode')">📋 复制</button>
+
+        <h3>5.4 加载消息 (chat.html 核心)</h3>
+        <div class="code-block" id="loadCode">
+<span class="comment">// chat.html — 从 GitHub Issues 加载消息</span>
+async function loadMessages() {
+    const url = `https://api.github.com/repos/${window.CONFIG.GITHUB_USERNAME}/${window.CONFIG.GITHUB_REPO}/issues?labels=chatmessage&state=open`;
+    const res = await fetch(url, {
+        headers: { 'Authorization': `token ${window.CONFIG.GITHUB_TOKEN}` }
+    });
+    const issues = await res.json();
+    
+    const messages = [];
+    for (const issue of issues) {
+        const match = issue.body.match(/```json\n([\s\S]*?)\n```/);
+        if (match) {
+            const msg = JSON.parse(match[1]);
+            <span class="comment">// 只显示当前聊天室的消息</span>
+            if (msg.roomId === currentRoom.id) {
+                messages.push(msg);
+            }
+        }
+    }
+    
+    <span class="comment">// 按时间排序</span>
+    messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    renderMessages(messages);
+}
+        </div>
+        <button class="btn-copy" onclick="copyCode('loadCode')">📋 复制</button>
+
+        <h3>5.5 完整的 HTML 模板</h3>
+        <div class="code-block" id="templateCode">
+<span class="comment">&lt;!DOCTYPE html&gt;</span>
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;我的聊天网站&lt;/title&gt;
+    &lt;script src="config.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="app"&gt;
+        &lt;div id="messages"&gt;&lt;/div&gt;
+        &lt;div id="input-area"&gt;
+            &lt;input type="text" id="messageInput" placeholder="输入消息..."&gt;
+            &lt;button onclick="sendMessage()"&gt;发送&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script src="chat.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+        </div>
+        <button class="btn-copy" onclick="copyCode('templateCode')">📋 复制</button>
+    </div>
+
+    <!-- ===== STEP 6 ===== -->
+    <div class="step" id="step6">
+        <h2>6. 部署到 GitHub Pages <span class="badge">第六步</span></h2>
+        <p>将你的代码推送到 GitHub，然后启用 Pages 服务。</p>
+        <ol>
+            <li><strong>创建文件：</strong>在仓库中点击 <strong>Add file</strong> → <strong>Create new file</strong></li>
+            <li><strong>上传代码：</strong>分别创建 <code>index.html</code>、<code>chat.html</code>、<code>config.js</code></li>
+            <li>点击 <strong>Commit new file</strong></li>
+            <li>进入仓库 <strong>Settings</strong> → <strong>Pages</strong></li>
+            <li>在 <strong>Branch</strong> 下选择 <code>main</code>，点击 <strong>Save</strong></li>
+            <li>等待 1-2 分钟，页面顶部会显示 <code>https://你的用户名.github.io/你的仓库名/</code></li>
+        </ol>
+        <div class="success">✅ <strong>部署成功！</strong> 现在所有人都可以通过这个链接访问你的网站了。</div>
+        <div class="tip">💡 <strong>自动部署：</strong>每次推送到 main 分支，GitHub Pages 会自动更新网站。</div>
+    </div>
+
+    <!-- ===== STEP 7 ===== -->
+    <div class="step" id="step7">
+        <h2>7. 本地开发与调试 <span class="badge">第七步</span></h2>
+        <p>在本地修改代码并预览效果：</p>
+        <div class="code-block">
+<span class="comment"># 方法一：使用 Python（推荐）</span>
+python3 -m http.server 8080
+<span class="comment"># 然后访问 http://localhost:8080</span>
+
+<span class="comment"># 方法二：使用 Node.js</span>
+npx serve .
+<span class="comment"># 然后访问 http://localhost:3000</span>
+
+<span class="comment"># 方法三：使用 VS Code 的 Live Server 插件</span>
+<span class="comment"># 安装后右键 index.html → Open with Live Server</span>
+        </div>
+        <div class="tip">💡 <strong>调试技巧：</strong>按 F12 打开浏览器开发者工具，在 Console 中查看错误信息。</div>
+    </div>
+
+    <!-- ===== STEP 8 ===== -->
+    <div class="step" id="step8">
+        <h2>8. 添加 AI 对话能力 <span class="badge">第八步</span></h2>
+        <p>使用免费的思知 AI 大模型，让你的聊天网站拥有智能对话能力。</p>
+        <h3>8.1 AI 对话核心代码</h3>
+        <div class="code-block" id="aiCode">
+<span class="comment">// AI 对话函数</span>
+const AI_CONFIG = {
+    apiUrl: 'https://api.sizhi.com/chat',
+    appid: '<span style="color:#34d399;">你的思知 AI AppID</span>'
+};
+
+async function callAI(message) {
+    const url = `${AI_CONFIG.apiUrl}?appid=${AI_CONFIG.appid}&spoken=${encodeURIComponent(message)}&memory=true`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.status === 0) {
+        return data.data.info.text;
+    }
+    return 'AI 暂时无法回答，请稍后再试。';
+}
+
+<span class="comment">// 在聊天中调用 AI</span>
+async function sendWithAI() {
+    const input = document.getElementById('messageInput');
+    const content = input.value.trim();
+    if (!content) return;
+    
+    <span class="comment">// 发送用户消息</span>
+    sendMessage(content);
+    
+    <span class="comment">// 调用 AI 回复</span>
+    const reply = await callAI(content);
+    sendMessage(reply, 'assistant');
+}
+        </div>
+        <button class="btn-copy" onclick="copyCode('aiCode')">📋 复制</button>
+
+        <h3>8.2 获取思知 AI AppID</h3>
+        <ol>
+            <li>访问 <a href="https://api.sizhi.com" target="_blank" style="color:#ffd700;">api.sizhi.com</a></li>
+            <li>注册账号并登录</li>
+            <li>进入控制台，创建应用</li>
+            <li>获取 <strong>AppID</strong></li>
+        </ol>
+        <div class="tip">💡 <strong>思知 AI 特点：</strong>完全免费，无调用次数限制，适合学习和个人项目。</div>
+    </div>
+
+    <!-- ===== STEP 9 ===== -->
+    <div class="step" id="step9">
+        <h2>9. 语音输入（浏览器自带） <span class="badge">第九步</span></h2>
+        <p>使用 Web Speech API 实现语音转文字，无需任何第三方服务。</p>
+        <div class="code-block" id="voiceCode">
+<span class="comment">// 浏览器自带语音识别</span>
+function startVoiceInput() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'zh-CN';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    
+    recognition.onstart = () => {
+        console.log('🎤 请说话...');
+    };
+    
+    recognition.onresult = (event) => {
+        let final = '';
+        for (let i = event.resultIndex; i &lt; event.results.length; i++) {
+            if (event.results[i].isFinal) {
+                final += event.results[i][0].transcript;
+            }
+        }
+        if (final) {
+            document.getElementById('messageInput').value = final;
+            <span class="comment">// 自动发送</span>
+            sendMessage();
+        }
+    };
+    
+    recognition.onerror = (event) => {
+        console.error('语音识别错误:', event.error);
+    };
+    
+    recognition.start();
+}
+        </div>
+        <button class="btn-copy" onclick="copyCode('voiceCode')">📋 复制</button>
+        <div class="tip">💡 <strong>浏览器兼容：</strong>Chrome、Edge、Safari 均支持。Firefox 部分支持。</div>
+    </div>
+
+    <!-- ===== STEP 10 ===== -->
+    <div class="step" id="step10">
+        <h2>10. 常见问题排查 <span class="badge">第十步</span></h2>
+        <table>
+            <thead>
+                <tr><th>问题</th><th>可能原因</th><th>解决方案</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>页面空白</td>
+                    <td>config.js 未加载或 Token 无效</td>
+                    <td>检查 config.js 是否存在，Token 是否正确</td>
+                </tr>
+                <tr>
+                    <td>登录失败</td>
+                    <td>用户名或密码错误</td>
+                    <td>确认注册时保存的信息，检查 GitHub Issues 中的用户数据</td>
+                </tr>
+                <tr>
+                    <td>消息发送失败</td>
+                    <td>Token 权限不足或网络问题</td>
+                    <td>确认 Token 有 repo 权限，检查控制台错误信息</td>
+                </tr>
+                <tr>
+                    <td>部署后无法访问</td>
+                    <td>Pages 未启用或路径错误</td>
+                    <td>检查 Settings → Pages 是否启用，确认仓库名正确</td>
+                </tr>
+                <tr>
+                    <td>AI 不回复</td>
+                    <td>AppID 错误或网络问题</td>
+                    <td>检查思知 AI AppID 是否正确，确认网络连接</td>
+                </tr>
+                <tr>
+                    <td>语音识别不工作</td>
+                    <td>浏览器不支持或未授权麦克风</td>
+                    <td>使用 Chrome/Edge，允许麦克风权限</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="tip">💡 <strong>调试技巧：</strong>按 F12 打开开发者工具，查看 Console 和 Network 标签页的错误信息。</div>
+    </div>
+
+    <!-- ===== 额外资源 ===== -->
+    <div class="step" style="border-color: rgba(255,215,0,0.3);">
+        <h2>📚 额外资源推荐</h2>
+        <p>以下资源可以帮助你进一步学习：</p>
+        <ul>
+            <li><strong>GitHub 官方文档：</strong><a href="https://docs.github.com/zh" target="_blank" style="color:#ffd700;">docs.github.com/zh</a></li>
+            <li><strong>MDN Web 文档：</strong><a href="https://developer.mozilla.org/zh-CN/" target="_blank" style="color:#ffd700;">developer.mozilla.org/zh-CN</a></li>
+            <li><strong>思知 AI 文档：</strong><a href="https://api.sizhi.com" target="_blank" style="color:#ffd700;">api.sizhi.com</a></li>
+            <li><strong>NFLSHC Chat 源码：</strong><a href="https://github.com/user-henry/nflshcchat" target="_blank" style="color:#ffd700;">github.com/user-henry/nflshcchat</a></li>
+        </ul>
+        <div class="tip">💡 <strong>建议：</strong>先从最小功能开始（如只有登录+聊天），逐步添加 AI 和语音功能。</div>
+    </div>
+
+    <!-- ===== 页脚 ===== -->
+    <div class="footer">
+        <p>📚 NFLSHC 202401 · 从零搭建聊天×AI 网站</p>
+        <p style="margin-top:4px; color:#444;">基于 GitHub Pages + GitHub Issues + 思知 AI · 完全免费</p>
+    </div>
+
+</div>
+
+<script>
+    // ============================================================
+    //  复制代码功能
+    // ============================================================
+    function copyCode(elementId) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        
+        // 获取纯文本内容（去除 HTML 标签）
+        let text = element.innerText;
+        // 移除行首的缩进空格（保持可读性）
+        text = text.replace(/^ {4}/gm, '');
+        
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = element.parentElement.querySelector('.btn-copy');
+            if (btn) {
+                btn.textContent = '✅ 已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }
+        }).catch(() => {
+            // 降级方案：使用 textarea
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            const btn = element.parentElement.querySelector('.btn-copy');
+            if (btn) {
+                btn.textContent = '✅ 已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }
+        });
+    }
+
+    // 为所有代码块添加复制按钮
+    document.querySelectorAll('.code-block').forEach(block => {
+        if (!block.parentElement.querySelector('.btn-copy')) {
+            const btn = document.createElement('button');
+            btn.className = 'btn-copy';
+            btn.textContent = '📋 复制';
+            btn.onclick = () => {
+                // 找到最近的 code-block 的 id
+                const id = block.id;
+                if (id) copyCode(id);
+            };
+            block.parentElement.insertBefore(btn, block);
+        }
+    });
+</script>
+</body>
+</html>
