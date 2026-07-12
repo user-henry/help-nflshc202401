@@ -380,6 +380,28 @@
         .mt-2 { margin-top: 16px; }
         .text-center { text-align: center; }
         .text-muted { color: var(--text-muted); }
+
+        /* ===== AI Search 快捷键提示 ===== */
+        .ai-shortcut-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .ai-shortcut-hint kbd {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: 11px;
+            font-family: inherit;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
     </style>
 </head>
 <body>
@@ -419,6 +441,10 @@
                 <span class="tag">📌 当前版本 v2.2.0</span>
                 <span class="tag">👥 社区成员 40+</span>
                 <span class="tag">💬 基于 GitHub Issues</span>
+                <span class="ai-shortcut-hint">
+                    <kbd>⌘</kbd> + <kbd>K</kbd> 或 <kbd>Ctrl</kbd> + <kbd>K</kbd>
+                    <span style="color:var(--accent-gold);">🔍 AI 搜索</span>
+                </span>
             </div>
         </div>
 
@@ -514,7 +540,7 @@
             <h3>第三步：开始第一次聊天</h3>
             <ol>
                 <li>在聊天主界面左侧，点击「+ 创建聊天室」。</li>
-                <li>选择「群聊」，输入名称（如“高一1班”），选择「公开」或「需验证码」。</li>
+                <li>选择「群聊」，输入名称（如"高一1班"），选择「公开」或「需验证码」。</li>
                 <li>创建成功后，点击进入聊天室。</li>
                 <li>在底部输入框输入文字，按 Enter 发送。</li>
                 <li>试试 Markdown：输入 <code>**粗体**</code> 或 <code># 标题</code> 看看效果。</li>
@@ -1094,7 +1120,7 @@ function hello() {
             <div class="img-wrapper">
                 <img src="https://cdn.luogu.com.cn/upload/image_hosting/o0duyzoq.png" alt="公众号二维码" style="max-height: 200px;">
             </div>
-            <p class="text-muted">在公众号中回复“软件”可获取 NFLSHC 202401 社区项目软件。</p>
+            <p class="text-muted">在公众号中回复"软件"可获取 NFLSHC 202401 社区项目软件。</p>
         </div>
 
         <!-- GitHub -->
@@ -1158,6 +1184,88 @@ function hello() {
         <p class="text-muted" style="font-size: 12px; margin-top: 8px;">基于 GitHub Pages 构建 · 与主站共享技术基因</p>
     </div>
 </footer>
+
+<!-- ============================================================ -->
+<!--  Cloudflare AI Search 组件                                     -->
+<!-- ============================================================ -->
+
+<!-- 1. 引入 AI Search 组件库 -->
+<script
+  type="module"
+  src="https://2c177107-5a66-4ac2-bf55-04f0bcad8fef.search.ai.cloudflare.com/assets/v0.0.40/search-snippet.es.js"
+></script>
+
+<!-- 2. 搜索弹窗（按 Cmd/Ctrl+K 唤出） -->
+<search-modal-snippet
+  api-url="https://2c177107-5a66-4ac2-bf55-04f0bcad8fef.search.ai.cloudflare.com/"
+  placeholder="搜索帮助文档..."
+  shortcut="k"
+  show-url="true"
+  show-date="true"
+  max-results="20"
+  max-render-results="10"
+>
+</search-modal-snippet>
+
+<!-- 3. 聊天气泡（固定在右下角） -->
+<chat-bubble-snippet
+  api-url="https://2c177107-5a66-4ac2-bf55-04f0bcad8fef.search.ai.cloudflare.com/"
+  placeholder="输入问题，AI 帮你解答..."
+>
+</chat-bubble-snippet>
+
+<!-- ============================================================ -->
+<!--  自定义样式（匹配帮助站风格）                                  -->
+<!-- ============================================================ -->
+<style>
+  /* 帮助站是浅色主题，使用金色作为主色 */
+  search-modal-snippet {
+    --search-snippet-primary-color: #f59e0b;
+    --search-snippet-border-radius: 12px;
+    --search-snippet-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  }
+  
+  chat-bubble-snippet {
+    --search-snippet-primary-color: #f59e0b;
+    --search-snippet-primary-hover: #d97706;
+    --search-snippet-border-radius: 12px;
+    --chat-bubble-button-size: 56px;
+    --chat-bubble-button-shadow: 0 4px 20px rgba(245, 158, 11, 0.35);
+    --chat-bubble-button-icon-color: #ffffff;
+    --chat-bubble-button-z-index: 9999;
+  }
+  
+  /* 按钮使用金色渐变 */
+  chat-bubble-snippet::part(button) {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  }
+  
+  /* 深色模式适配 - 如果用户系统是深色模式 */
+  @media (prefers-color-scheme: dark) {
+    search-modal-snippet {
+      --search-snippet-background: #1a1a2e;
+      --search-snippet-surface: #16213e;
+      --search-snippet-text-color: #eef4ff;
+      --search-snippet-text-secondary: #888;
+      --search-snippet-border-color: #2a2a3e;
+      --search-snippet-assistant-message-bg: #16213e;
+      --search-snippet-assistant-message-text: #eef4ff;
+      --search-snippet-user-message-bg: #f59e0b;
+      --search-snippet-user-message-text: #1a1a2e;
+    }
+    chat-bubble-snippet {
+      --search-snippet-background: #1a1a2e;
+      --search-snippet-surface: #16213e;
+      --search-snippet-text-color: #eef4ff;
+      --search-snippet-text-secondary: #888;
+      --search-snippet-border-color: #2a2a3e;
+      --search-snippet-assistant-message-bg: #16213e;
+      --search-snippet-assistant-message-text: #eef4ff;
+      --search-snippet-user-message-bg: #f59e0b;
+      --search-snippet-user-message-text: #1a1a2e;
+    }
+  }
+</style>
 
 <script>
     // ============================================================
@@ -1299,6 +1407,8 @@ function hello() {
     })();
 
     console.log('📖 NFLSHC 202401 帮助站已加载！');
+    console.log('🤖 AI 搜索已启用：按 Cmd/Ctrl+K 唤出搜索弹窗');
+    console.log('💬 右下角金色气泡可进行 AI 对话');
 </script>
 
 </body>
