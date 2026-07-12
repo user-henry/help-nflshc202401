@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 搜索 - 官方组件测试</title>
+    <title>AI 聊天气泡 - 官方组件测试</title>
     <style>
+        /* ===== 页面基础样式 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -15,9 +16,8 @@
             justify-content: center;
             align-items: center;
         }
-
         .container {
-            max-width: 800px;
+            max-width: 600px;
             padding: 40px 20px;
             text-align: center;
         }
@@ -26,36 +26,29 @@
             color: #ffd700;
             margin-bottom: 12px;
         }
-        .container .sub {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 30px;
+        .container p {
+            color: #aaa;
+            font-size: 16px;
+            line-height: 1.8;
         }
-        .container .demo-box {
+        .container .test-card {
             background: #16213e;
             border-radius: 12px;
-            padding: 30px;
+            padding: 24px;
+            margin-top: 24px;
             border: 1px solid #2a2a3e;
-            margin-bottom: 20px;
         }
-        .container .demo-box h3 {
-            color: #ffd700;
-            font-size: 16px;
+        .container .test-card .icon {
+            font-size: 48px;
+            display: block;
             margin-bottom: 12px;
         }
-        .container .demo-box p {
-            color: #aaa;
-            font-size: 13px;
-            margin-bottom: 16px;
-        }
-
-        /* 状态提示 */
         .status {
             display: inline-block;
             padding: 6px 16px;
             border-radius: 20px;
             font-size: 13px;
-            margin-top: 8px;
+            margin-top: 12px;
         }
         .status.loading {
             background: rgba(255, 215, 0, 0.15);
@@ -69,124 +62,58 @@
             background: rgba(220, 53, 69, 0.15);
             color: #dc3545;
         }
-
-        /* 键盘快捷键提示 */
         .shortcut-hint {
-            font-size: 12px;
+            margin-top: 20px;
+            font-size: 13px;
             color: #555;
-            margin-top: 16px;
         }
         .shortcut-hint kbd {
             background: #0f0f1a;
             border: 1px solid #2a2a3e;
             border-radius: 4px;
             padding: 2px 8px;
-            font-size: 11px;
+            font-size: 12px;
             font-family: inherit;
             color: #aaa;
-        }
-
-        /* 组件自定义样式 */
-        search-bar-snippet,
-        search-modal-snippet,
-        chat-bubble-snippet {
-            --search-snippet-primary-color: #ffd700;
-            --search-snippet-primary-hover: #e6c200;
-            --search-snippet-border-radius: 12px;
-            --search-snippet-background: #1a1a2e;
-            --search-snippet-surface: #16213e;
-            --search-snippet-text-color: #eef4ff;
-            --search-snippet-text-secondary: #888;
-            --search-snippet-border-color: #2a2a3e;
-            --search-snippet-user-message-bg: #ffd700;
-            --search-snippet-user-message-text: #1a1a2e;
-            --search-snippet-assistant-message-bg: #16213e;
-            --search-snippet-assistant-message-text: #eef4ff;
-        }
-
-        chat-bubble-snippet {
-            --chat-bubble-button-size: 56px;
-            --chat-bubble-button-shadow: 0 4px 20px rgba(255, 215, 0, 0.35);
-            --chat-bubble-button-icon-color: #1a1a2e;
-            --chat-bubble-button-z-index: 9999;
-        }
-
-        /* 按钮金色渐变 */
-        chat-bubble-snippet::part(button) {
-            background: linear-gradient(135deg, #ffd700 0%, #f59e0b 100%) !important;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🤖 AI 搜索组件测试</h1>
-        <p class="sub">使用 Cloudflare AI Search 官方 Web Components</p>
-
-        <!-- ===== 测试状态 ===== -->
-        <div class="demo-box">
-            <h3>📊 测试状态</h3>
-            <p>页面加载后，组件会自动初始化。下方显示当前状态：</p>
+        <h1>🧪 AI 聊天气泡测试</h1>
+        <p>基于 Cloudflare 官方 Web Component</p>
+        <div class="test-card">
+            <span class="icon">🤖</span>
+            <p style="color: #ffd700; font-weight: bold;">Cloudflare AI Search</p>
+            <p style="font-size: 13px; color: #666;">右下角将显示聊天气泡，点击即可对话</p>
             <div id="statusDisplay" class="status loading">⏳ 组件加载中...</div>
         </div>
-
-        <!-- ===== 搜索框组件 ===== -->
-        <div class="demo-box">
-            <h3>🔍 搜索框 (Search Bar)</h3>
-            <p>直接在页面中搜索，结果实时显示</p>
-            <search-bar-snippet
-                id="searchBar"
-                api-url="https://2c177107-5a66-4ac2-bf55-04f0bcad8fef.search.ai.cloudflare.com/"
-                placeholder="搜索帮助文档..."
-                max-results="10"
-                max-render-results="5"
-                show-url="true"
-                show-date="true"
-            ></search-bar-snippet>
-        </div>
-
-        <!-- ===== 搜索弹窗组件 ===== -->
-        <div class="demo-box">
-            <h3>⌨️ 搜索弹窗 (Search Modal)</h3>
-            <p>按 <kbd>Ctrl</kbd> + <kbd>K</kbd> 或 <kbd>⌘</kbd> + <kbd>K</kbd> 唤出</p>
-            <search-modal-snippet
-                id="searchModal"
-                api-url="https://2c177107-5a66-4ac2-bf55-04f0bcad8fef.search.ai.cloudflare.com/"
-                placeholder="搜索帮助文档..."
-                shortcut="k"
-                show-url="true"
-                show-date="true"
-                max-results="10"
-                max-render-results="5"
-            ></search-modal-snippet>
-        </div>
-
-        <!-- ===== 快捷键提示 ===== -->
         <div class="shortcut-hint">
-            <kbd>Ctrl</kbd> + <kbd>K</kbd> 或 <kbd>⌘</kbd> + <kbd>K</kbd> 打开搜索弹窗 · <kbd>ESC</kbd> 关闭
+            <kbd>Ctrl</kbd> + <kbd>K</kbd> 或 <kbd>⌘</kbd> + <kbd>K</kbd> 快速打开 · <kbd>ESC</kbd> 关闭
         </div>
     </div>
 
-    <!-- ========================================================== -->
-    <!--  1. 引入官方组件库                                          -->
-    <!-- ========================================================== -->
+    <!-- ============================================================ -->
+    <!--  1. 引入官方组件库                                            -->
+    <!-- ============================================================ -->
     <script
         type="module"
         src="https://2c177107-5a66-4ac2-bf55-04f0bcad8fef.search.ai.cloudflare.com/assets/v0.0.40/search-snippet.es.js"
     ></script>
 
-    <!-- ========================================================== -->
-    <!--  2. 聊天气泡组件（固定在右下角）                            -->
-    <!-- ========================================================== -->
+    <!-- ============================================================ -->
+    <!--  2. 聊天气泡组件（必须设置 api-url）                          -->
+    <!-- ============================================================ -->
     <chat-bubble-snippet
-        id="chatBubble"
         api-url="https://2c177107-5a66-4ac2-bf55-04f0bcad8fef.search.ai.cloudflare.com/"
         placeholder="输入问题，AI 帮你解答..."
+        theme="dark"
     ></chat-bubble-snippet>
 
-    <!-- ========================================================== -->
-    <!--  3. 初始化检测脚本                                          -->
-    <!-- ========================================================== -->
+    <!-- ============================================================ -->
+    <!--  3. 状态检测脚本                                              -->
+    <!-- ============================================================ -->
     <script>
         (function() {
             const statusDisplay = document.getElementById('statusDisplay');
@@ -199,22 +126,21 @@
 
             // 检测组件是否加载成功
             function checkComponents() {
-                const hasSearchBar = !!document.querySelector('search-bar-snippet');
-                const hasSearchModal = !!document.querySelector('search-modal-snippet');
                 const hasChatBubble = !!document.querySelector('chat-bubble-snippet');
-
-                if (hasSearchBar && hasSearchModal && hasChatBubble) {
-                    updateStatus('✅ 所有组件加载成功！可以开始使用', 'ready');
-                    console.log('✅ 所有 AI Search 组件加载成功');
+                if (hasChatBubble) {
+                    updateStatus('✅ 组件加载成功！点击右下角气泡测试', 'ready');
+                    console.log('✅ Chat Bubble 组件加载成功');
                 } else {
-                    const missing = [];
-                    if (!hasSearchBar) missing.push('search-bar-snippet');
-                    if (!hasSearchModal) missing.push('search-modal-snippet');
-                    if (!hasChatBubble) missing.push('chat-bubble-snippet');
-                    updateStatus('⚠️ 部分组件未加载: ' + missing.join(', ') + '，请检查网络', 'error');
-                    console.warn('⚠️ 组件加载不完整:', missing);
+                    updateStatus('⚠️ 组件未加载，请检查网络', 'error');
+                    console.warn('⚠️ Chat Bubble 组件未找到');
                 }
             }
+
+            // 监听组件 ready 事件
+            document.addEventListener('ready', function(e) {
+                console.log('✅ 组件已就绪:', e.target.tagName);
+                updateStatus('✅ 组件已就绪，可以正常使用', 'ready');
+            });
 
             // 等待 DOM 渲染完成
             if (document.readyState === 'complete') {
@@ -225,15 +151,8 @@
                 });
             }
 
-            // 监听组件 ready 事件
-            document.addEventListener('ready', function(e) {
-                console.log('✅ 组件已就绪:', e.target.tagName);
-                updateStatus('✅ 组件已就绪，可以正常使用', 'ready');
-            });
-
-            console.log('🤖 AI 搜索组件测试页面已加载');
+            console.log('🤖 AI 聊天气泡测试页面已加载');
             console.log('🔗 API 端点: https://2c177107-5a66-4ac2-bf55-04f0bcad8fef.search.ai.cloudflare.com/');
-            console.log('💡 按 Ctrl/Cmd+K 打开搜索弹窗');
             console.log('💬 右下角金色气泡可进行 AI 对话');
         })();
     </script>
