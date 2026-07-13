@@ -176,6 +176,7 @@
             background: white;
             padding: 8px;
             transition: transform 0.3s;
+            cursor: pointer;
         }
         .qr-card .qr-left img:hover {
             transform: scale(1.05);
@@ -252,6 +253,20 @@
             transform: translateY(-2px);
             box-shadow: none;
         }
+        .qr-card .qr-right .qr-actions .qr-btn-email {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .qr-card .qr-right .qr-actions .qr-btn-email:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: none;
+        }
         .qr-card .qr-arrow {
             font-size: 28px;
             color: var(--accent-gold);
@@ -291,6 +306,82 @@
             }
             .hero p {
                 font-size: 15px;
+            }
+        }
+
+        /* ===== 图片放大弹窗 ===== */
+        .image-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            animation: fadeIn 0.3s ease;
+        }
+        .image-modal-overlay.open {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .image-modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .image-modal-content .close-modal-btn {
+            position: absolute;
+            top: -50px;
+            right: -10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            transition: color 0.2s;
+            z-index: 10;
+            line-height: 1;
+        }
+        .image-modal-content .close-modal-btn:hover {
+            color: #f59e0b;
+        }
+        .image-modal-content img {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            background: white;
+            padding: 12px;
+        }
+        .image-modal-content .modal-caption {
+            color: #aaa;
+            font-size: 14px;
+            margin-top: 16px;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .image-modal-content .close-modal-btn {
+                top: -44px;
+                right: 0;
+                font-size: 28px;
+            }
+            .image-modal-content img {
+                padding: 8px;
+            }
+            .image-modal-overlay {
+                padding: 16px;
             }
         }
 
@@ -605,7 +696,7 @@
             <p>这里是 NFLSHC Chat 主站的官方帮助中心。无论你是新用户还是老成员，这里都有你需要的答案。</p>
             <div class="flex mt-2">
                 <span class="tag">📌 当前版本 v2.2.0</span>
-                <span class="tag">👥 社区成员 40+</span>
+                <span class="tag">👥 社区成员</span>
                 <span class="tag">💬 基于 GitHub Issues</span>
                 <span class="ai-shortcut-hint">
                     <kbd>⌘</kbd> + <kbd>K</kbd> 或 <kbd>Ctrl</kbd> + <kbd>K</kbd>
@@ -617,27 +708,39 @@
         <!-- ===== 群聊二维码卡片 ===== -->
         <div class="qr-card">
             <div class="qr-left">
-                <img src="https://cdn.luogu.com.cn/upload/image_hosting/li8od9a9.png" alt="NFLSHC Chat 群聊二维码" loading="lazy">
+                <img src="https://cdn.luogu.com.cn/upload/image_hosting/li8od9a9.png" alt="NFLSHC Chat 群聊二维码" loading="lazy" id="qrImage" onclick="openImageModal()">
             </div>
             <div class="qr-right">
                 <div class="qr-badge">💬 扫码加入</div>
                 <h3>NFLSHC Chat 官方群聊</h3>
                 <p>扫描二维码加入 NFLSHC 202401 社区群聊，与同学们实时交流、反馈问题、获取最新动态。</p>
                 <div class="qr-tips">
-                    <span><i class="fas fa-users"></i> 已有 40+ 成员</span>
                     <span><i class="fas fa-message"></i> 实时交流</span>
                     <span><i class="fas fa-bell"></i> 获取更新通知</span>
+                    <span><i class="fas fa-shield"></i> 社区互动</span>
                 </div>
                 <div class="qr-actions">
-                    <button class="qr-btn" onclick="window.open('https://cdn.luogu.com.cn/upload/image_hosting/li8od9a9.png', '_blank')">
+                    <button class="qr-btn" onclick="openImageModal()">
                         <i class="fas fa-expand"></i> 查看大图
                     </button>
                     <button class="qr-btn qr-btn-outline" onclick="downloadQR()">
                         <i class="fas fa-download"></i> 下载二维码
                     </button>
+                    <button class="qr-btn qr-btn-email" onclick="location.href='mailto:contact@nflshcchat.cc.cd'">
+                        <i class="fas fa-envelope"></i> 联系管理员
+                    </button>
                 </div>
             </div>
             <div class="qr-arrow">→</div>
+        </div>
+
+        <!-- ===== 图片放大弹窗 ===== -->
+        <div class="image-modal-overlay" id="imageModal" onclick="closeImageModal()">
+            <div class="image-modal-content" onclick="event.stopPropagation()">
+                <button class="close-modal-btn" onclick="closeImageModal()">✕</button>
+                <img src="https://cdn.luogu.com.cn/upload/image_hosting/li8od9a9.png" alt="NFLSHC Chat 群聊二维码 - 放大" id="modalImage">
+                <div class="modal-caption">📱 扫码加入 NFLSHC Chat 官方群聊</div>
+            </div>
         </div>
 
         <div class="card-grid">
@@ -781,6 +884,7 @@
 
         <!-- 功能卡片网格 -->
         <div class="card-grid" id="featureGrid">
+            <!-- ... 功能卡片保持不变 ... -->
             <div class="card" data-keywords="群聊 私聊 多人 一对一 聊天">
                 <span class="icon">💬</span>
                 <h3>群聊 &amp; 私聊</h3>
@@ -914,6 +1018,7 @@
 
     <!-- ==================== Markdown 使用介绍 ==================== -->
     <section class="page" id="page-markdown">
+        <!-- ... Markdown 内容保持不变 ... -->
         <h1 class="section-title"><i class="fab fa-markdown"></i> Markdown 使用介绍 <span class="badge">让消息更丰富</span></h1>
         <p style="color: var(--text-secondary); margin-bottom: 24px;">NFLSHC Chat 支持完整的 Markdown 语法，让你的消息更加美观、专业。下面为你介绍所有支持的语法。</p>
 
@@ -1357,8 +1462,23 @@ function hello() {
         <!-- 联系管理员 -->
         <div class="content-block">
             <h3>📧 联系管理员</h3>
-            <p><strong>用户名</strong>：huangzhiyuan</p>
-            <p><strong>联系方式</strong>：在主站创建与 huangzhiyuan 的私聊房间。</p>
+            <p><strong>邮箱地址</strong>：</p>
+            <ul style="list-style: none; padding-left: 0;">
+                <li style="margin-bottom: 8px;">
+                    <i class="fas fa-envelope" style="color: var(--accent-gold); width: 20px;"></i>
+                    <a href="mailto:admin@nflshcchat.cc.cd" style="font-weight: 500;">admin@nflshcchat.cc.cd</a>
+                    <span style="font-size: 12px; color: var(--text-muted); margin-left: 8px;">（管理员专用）</span>
+                </li>
+                <li style="margin-bottom: 8px;">
+                    <i class="fas fa-envelope" style="color: var(--accent-blue); width: 20px;"></i>
+                    <a href="mailto:contact@nflshcchat.cc.cd" style="font-weight: 500;">contact@nflshcchat.cc.cd</a>
+                    <span style="font-size: 12px; color: var(--text-muted); margin-left: 8px;">（公共联系）</span>
+                </li>
+            </ul>
+            <p style="margin-top: 12px; font-size: 14px; color: var(--text-secondary);">
+                <i class="fas fa-clock" style="color: var(--accent-gold);"></i>
+                我们会在 24 小时内回复您的邮件。
+            </p>
         </div>
     </section>
 
@@ -1546,10 +1666,50 @@ function hello() {
         });
     })();
 
+    // ============================================================
+    //  📱 二维码相关功能
+    // ============================================================
+
+    // 打开图片放大弹窗
+    function openImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // 关闭图片放大弹窗
+    function closeImageModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // 下载二维码
+    function downloadQR() {
+        const link = document.createElement('a');
+        link.href = 'https://cdn.luogu.com.cn/upload/image_hosting/li8od9a9.png';
+        link.download = 'NFLSHC_Chat_群聊二维码.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // 键盘快捷键：ESC 关闭弹窗
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('imageModal');
+            if (modal.classList.contains('open')) {
+                closeImageModal();
+            }
+        }
+    });
+
     console.log('📖 NFLSHC 202401 帮助站已加载！');
     console.log('🤖 AI 搜索已启用：按 Cmd/Ctrl+K 唤出搜索弹窗');
     console.log('💬 右下角金色气泡可进行 AI 对话');
     console.log('🔗 API 代理地址: https://help.nflshc202401.henry861500x.workers.dev/api/ai/');
+    console.log('📱 点击群聊二维码可查看大图');
+    console.log('📧 联系邮箱: admin@nflshcchat.cc.cd  |  contact@nflshcchat.cc.cd');
 </script>
 
 </body>
