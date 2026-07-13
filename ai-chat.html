@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFLSHC 202401 · AI 问答</title>
+    <!-- 使用帮助站风格 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            color: #eef4ff;
+        }
+        
+        /* ===== 导航栏（帮助站风格） ===== */
+        .nav {
+            background: rgba(15, 15, 26, 0.9);
+            backdrop-filter: blur(12px);
+            padding: 12px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-left { display: flex; align-items: center; gap: 15px; }
+        .logo {
+            width: 40px;
+            height: 40px;
+            background-image: url('https://cdn.luogu.com.cn/upload/image_hosting/5rdb3c08.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .nav h2 { 
+            font-size: 20px; 
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav a {
+            color: #aaa;
+            text-decoration: none;
+            margin-left: 20px;
+            transition: color 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .nav a:hover { color: #f59e0b; }
+        .nav .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        .nav .back-link:hover {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+        }
+        
+        @media (max-width: 768px) {
+            .nav { flex-direction: column; gap: 10px; text-align: center; padding: 12px 16px; }
+            .nav div:last-child { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+            .nav a { margin-left: 0; font-size: 13px; }
+        }
+        
+        /* ===== AI 聊天容器 ===== */
+        .ai-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .ai-header {
+            text-align: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #2a2a3e;
+            margin-bottom: 16px;
+        }
+        .ai-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .ai-header p {
+            color: #888;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .ai-header .badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #f59e0b;
+            margin-top: 6px;
+        }
+        
+        /* ===== AI 搜索组件容器 ===== */
+        .ai-chat-wrapper {
+            flex: 1;
+            min-height: 400px;
+            background: #16213e;
+            border-radius: 16px;
+            border: 1px solid #2a2a3e;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* ===== 自定义组件样式 ===== */
+        chat-page-snippet {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+        }
+        
+        /* 覆盖组件样式以匹配帮助站主题 */
+        chat-page-snippet {
+            --search-snippet-primary-color: #f59e0b;
+            --search-snippet-primary-hover: #d97706;
+            --search-snippet-background: #1a1a2e;
+            --search-snippet-surface: #16213e;
+            --search-snippet-text-color: #eef4ff;
+            --search-snippet-text-secondary: #888;
+            --search-snippet-text-description: #aaa;
+            --search-snippet-border-color: #2a2a3e;
+            --search-snippet-hover-background: #2a2a3e;
+            --search-snippet-focus-ring: rgba(245, 158, 11, 0.4);
+            --search-snippet-error-color: #dc3545;
+            --search-snippet-success-color: #2ecc71;
+            --search-snippet-warning-color: #f39c12;
+            --search-snippet-user-message-bg: #f59e0b;
+            --search-snippet-user-message-text: #1a1a2e;
+            --search-snippet-assistant-message-bg: #16213e;
+            --search-snippet-assistant-message-text: #eef4ff;
+            --search-snippet-system-message-bg: rgba(243, 156, 18, 0.2);
+            --search-snippet-system-message-text: #f39c12;
+            --search-snippet-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --search-snippet-font-size-base: 14px;
+            --search-snippet-border-radius: 12px;
+            --search-snippet-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            --search-snippet-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --search-snippet-z-modal: 100;
+            --search-snippet-z-popover: 110;
+            --search-snippet-z-tooltip: 120;
+            --chat-bubble-button-icon-color: #1a1a2e;
+        }
+        
+        /* ===== 加载状态 ===== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            padding: 40px;
+            text-align: center;
+        }
+        .empty-state .icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        .empty-state h3 {
+            color: #f59e0b;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            font-size: 14px;
+            max-width: 400px;
+        }
+        
+        /* ===== 加载动画 ===== */
+        .loading-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #2a2a3e;
+            border-top-color: #f59e0b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* ===== 页脚 ===== */
+        .footer {
+            text-align: center;
+            padding: 16px 0;
+            color: #555;
+            font-size: 12px;
+            border-top: 1px solid #2a2a3e;
+            margin-top: 16px;
+        }
+        .footer a {
+            color: #f59e0b;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .ai-container { padding: 12px; height: calc(100vh - 70px); }
+            .ai-header h1 { font-size: 22px; }
+            .ai-chat-wrapper { min-height: 350px; border-radius: 12px; }
+            chat-page-snippet { min-height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 导航栏 ===== -->
+    <div class="nav">
+        <div class="nav-left">
+            <div class="logo"></div>
+            <h2>💬 NFLSHC 帮助站</h2>
+        </div>
+        <div>
+            <a href="https://help.nflshcchat.cc.cd/" target="_blank">📖 帮助站首页</a>
+            <a href="https://user-henry.github.io/nflshcchat/chat.html" target="_blank">💬 主站聊天</a>
+            <a href="https://user-henry.github.io/nflshcchat/index.html" target="_blank">🔐 登录</a>
+            <a href="#" class="back-link" onclick="history.back()">← 返回</a>
+        </div>
+    </div>
+
+    <!-- ===== AI 聊天主区域 ===== -->
+    <div class="ai-container">
+        <div class="ai-header">
+            <h1>🤖 AI 智能问答</h1>
+            <p>基于 NFLSHC Chat 知识库 · 问任何关于项目的问题</p>
+            <span class="badge">🔗 由 Cloudflare AI Search 驱动</span>
+        </div>
+
+        <div class="ai-chat-wrapper" id="aiChatWrapper">
+            <!-- 加载状态 -->
+            <div class="empty-state" id="loadingState">
+                <div class="loading-spinner"></div>
+                <h3>⏳ 加载中...</h3>
+                <p>AI 问答助手正在启动，请稍候</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 页脚 ===== -->
+    <div class="footer">
+        <p>© 2026 NFLSHC 202401 社区 · <a href="https://github.com/user-henry/help-nflshc202401" target="_blank">GitHub</a></p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!--  Cloudflare AI Search 组件                                    -->
+    <!--  API 代理地址: https://help.nflshc202401.henry861500x.workers.dev/api/ai/ -->
+    <!-- ============================================================ -->
+    <script>
+        // ============================================================
+        //  配置
+        // ============================================================
+        const AI_API_URL = 'https://help.nflshc202401.henry861500x.workers.dev/api/ai/';
+        
+        // ============================================================
+        //  加载 AI 组件
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const wrapper = document.getElementById('aiChatWrapper');
+            
+            // 移除加载状态
+            const loadingState = document.getElementById('loadingState');
+            if (loadingState) loadingState.remove();
+            
+            // 动态创建 chat-page-snippet 组件
+            const chatPage = document.createElement('chat-page-snippet');
+            chatPage.setAttribute('api-url', AI_API_URL);
+            chatPage.setAttribute('placeholder', '输入问题，AI 帮你解答...');
+            chatPage.setAttribute('hide-branding', 'false');
+            wrapper.appendChild(chatPage);
+            
+            // 动态加载组件库
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = 'https://2c177107-5a66-4ac2-bf55-04f0bcad8fef.search.ai.cloudflare.com/assets/v0.0.40/search-snippet.es.js';
+            document.head.appendChild(script);
+            
+            console.log('🤖 AI 问答页面已加载');
+            console.log('🔗 API 代理地址:', AI_API_URL);
+        });
+
+        // ============================================================
+        //  工具函数
+        // ============================================================
+        function goBack() {
+            if (document.referrer && document.referrer.includes(window.location.hostname)) {
+                history.back();
+            } else {
+                window.location.href = 'https://help.nflshcchat.cc.cd/';
+            }
+        }
+        
+        console.log('📖 NFLSHC 202401 帮助站 · AI 问答页面');
+        console.log('💡 输入问题，AI 将基于帮助站知识库回答');
+    </script>
+
+    <!-- ===== 备选：如果组件加载失败，显示提示 ===== -->
+    <noscript>
+        <div style="text-align:center;padding:60px;color:#666;">
+            <span style="font-size:48px;display:block;margin-bottom:16px;">⚠️</span>
+            <h3>需要启用 JavaScript</h3>
+            <p>AI 问答功能需要 JavaScript 支持，请启用后重试。</p>
+        </div>
+    </noscript>
+
+</body>
+</html>

@@ -147,6 +147,153 @@
         .hero h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
         .hero p { font-size: 18px; color: var(--text-secondary); max-width: 640px; }
 
+        /* ===== 群聊二维码卡片 ===== */
+        .qr-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px 40px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            transition: all 0.3s;
+        }
+        .qr-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent-gold);
+        }
+        .qr-card .qr-left {
+            flex-shrink: 0;
+        }
+        .qr-card .qr-left img {
+            width: 140px;
+            height: 140px;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border-color);
+            object-fit: contain;
+            background: white;
+            padding: 8px;
+            transition: transform 0.3s;
+        }
+        .qr-card .qr-left img:hover {
+            transform: scale(1.05);
+        }
+        .qr-card .qr-right {
+            flex: 1;
+        }
+        .qr-card .qr-right .qr-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+        .qr-card .qr-right h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .qr-card .qr-right p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 12px;
+            line-height: 1.7;
+        }
+        .qr-card .qr-right .qr-tips {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .qr-card .qr-right .qr-tips span {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .qr-card .qr-right .qr-tips span i {
+            color: var(--accent-gold);
+        }
+        .qr-card .qr-right .qr-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .qr-card .qr-right .qr-actions .qr-btn {
+            padding: 8px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #d97706 100%);
+            color: white;
+        }
+        .qr-card .qr-right .qr-actions .qr-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        .qr-card .qr-right .qr-actions .qr-btn-outline {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        .qr-card .qr-right .qr-actions .qr-btn-outline:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: none;
+        }
+        .qr-card .qr-arrow {
+            font-size: 28px;
+            color: var(--accent-gold);
+            flex-shrink: 0;
+            animation: bounceRight 2s infinite;
+        }
+        @keyframes bounceRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(8px); }
+        }
+
+        @media (max-width: 768px) {
+            .qr-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 24px 20px;
+                gap: 20px;
+            }
+            .qr-card .qr-left img {
+                width: 120px;
+                height: 120px;
+            }
+            .qr-card .qr-right .qr-tips {
+                justify-content: center;
+            }
+            .qr-card .qr-right .qr-actions {
+                justify-content: center;
+            }
+            .qr-card .qr-arrow {
+                display: none;
+            }
+            .hero {
+                padding: 30px 20px;
+            }
+            .hero h1 {
+                font-size: 24px;
+            }
+            .hero p {
+                font-size: 15px;
+            }
+        }
+
         /* ===== 卡片网格 ===== */
         .card-grid {
             display: grid;
@@ -465,6 +612,32 @@
                     <span style="color:var(--accent-gold);">🔍 AI 搜索</span>
                 </span>
             </div>
+        </div>
+
+        <!-- ===== 群聊二维码卡片 ===== -->
+        <div class="qr-card">
+            <div class="qr-left">
+                <img src="https://cdn.luogu.com.cn/upload/image_hosting/li8od9a9.png" alt="NFLSHC Chat 群聊二维码" loading="lazy">
+            </div>
+            <div class="qr-right">
+                <div class="qr-badge">💬 扫码加入</div>
+                <h3>NFLSHC Chat 官方群聊</h3>
+                <p>扫描二维码加入 NFLSHC 202401 社区群聊，与同学们实时交流、反馈问题、获取最新动态。</p>
+                <div class="qr-tips">
+                    <span><i class="fas fa-users"></i> 已有 40+ 成员</span>
+                    <span><i class="fas fa-message"></i> 实时交流</span>
+                    <span><i class="fas fa-bell"></i> 获取更新通知</span>
+                </div>
+                <div class="qr-actions">
+                    <button class="qr-btn" onclick="window.open('https://cdn.luogu.com.cn/upload/image_hosting/li8od9a9.png', '_blank')">
+                        <i class="fas fa-expand"></i> 查看大图
+                    </button>
+                    <button class="qr-btn qr-btn-outline" onclick="downloadQR()">
+                        <i class="fas fa-download"></i> 下载二维码
+                    </button>
+                </div>
+            </div>
+            <div class="qr-arrow">→</div>
         </div>
 
         <div class="card-grid">
@@ -1217,7 +1390,7 @@ function hello() {
 
 <!-- 2. 搜索弹窗（按 Cmd/Ctrl+K 唤出） -->
 <search-modal-snippet
-    api-url="https://help.nflshcchat.cc.cd/api/ai/"
+    api-url="https://help.nflshc202401.henry861500x.workers.dev/api/ai/"
     placeholder="搜索帮助文档..."
     shortcut="k"
     show-url="true"
@@ -1229,7 +1402,7 @@ function hello() {
 
 <!-- 3. 聊天气泡（固定在右下角） -->
 <chat-bubble-snippet
-    api-url="https://help.nflshcchat.cc.cd/api/ai/"
+    api-url="https://help.nflshc202401.henry861500x.workers.dev/api/ai/"
     placeholder="输入问题，AI 帮你解答..."
 >
 </chat-bubble-snippet>
@@ -1376,7 +1549,7 @@ function hello() {
     console.log('📖 NFLSHC 202401 帮助站已加载！');
     console.log('🤖 AI 搜索已启用：按 Cmd/Ctrl+K 唤出搜索弹窗');
     console.log('💬 右下角金色气泡可进行 AI 对话');
-    console.log('🔗 API 代理地址: https://help.nflshcchat.cc.cd/api/ai/');
+    console.log('🔗 API 代理地址: https://help.nflshc202401.henry861500x.workers.dev/api/ai/');
 </script>
 
 </body>
