@@ -1,3 +1,9 @@
 name = "help-nflshc202401"
+main = "_worker.js"
 compatibility_date = "2026-08-08"
 compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "."
+
+# .assetsignore 中已声明 _worker.js，避免其被当作静态资产上传
