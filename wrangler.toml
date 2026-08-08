@@ -6,4 +6,3 @@ compatibility_flags = ["nodejs_compat"]
 # 静态资产：把当前目录作为站点静态资源托管，_worker.js 作为请求入口拦截 /api/* 等动态路由
 [assets]
 directory = "."
-not_found_handling = "single-page-application"
