@@ -140,13 +140,13 @@
         <h2>📖 一、项目概述</h2>
         <p><strong>项目名称：</strong>NFLSHC Chat</p>
         <p><strong>网站地址：</strong>https://user-henry.github.io/nflshcchat/</p>
-        <p><strong>项目简介：</strong>一款基于 GitHub Issues 构建的轻量级聊天平台，支持群聊、私聊、Markdown 消息、消息收藏、聊天记录导出、群聊统计、意见反馈、好友系统、用户等级、个人数据仪表盘等功能。</p>
+        <p><strong>项目简介：</strong>一款基于 Cloudflare D1 构建的轻量级聊天平台，支持群聊、私聊、Markdown 消息、消息收藏、聊天记录导出、群聊统计、意见反馈、好友系统、用户等级、个人数据仪表盘等功能。</p>
         <p><strong>开发者：</strong>HZY</p>
         <p><strong>项目贡献者：</strong>NFLSHC 202401 社区成员</p>
         <p><strong>当前版本：</strong>v2.2.0</p>
         <p><strong>更新日期：</strong>2026年4月</p>
         <p><strong>管理员用户名：</strong>huangzhiyuan</p>
-        <p><strong>技术架构：</strong>纯前端 HTML/CSS/JavaScript + GitHub REST API + GitHub Issues 作为数据库</p>
+        <p><strong>技术架构：</strong>纯前端 HTML/CSS/JavaScript + Cloudflare Workers API + Cloudflare D1 作为数据库</p>
         <p><strong>部署方式：</strong>GitHub Pages + GitHub Actions 自动部署</p>
     </div>
 
@@ -161,7 +161,7 @@
             <li>用户需要填写<strong>用户名</strong>、<strong>邮箱</strong>、<strong>密码</strong>（至少6位）进行注册</li>
             <li>可以填写<strong>个人简介</strong>（选填）</li>
             <li>注册成功后自动跳转到登录页面</li>
-            <li>数据存储：GitHub Issues（label: <code>user</code>）</li>
+            <li>数据存储：Cloudflare D1（表: user）</li>
         </ul>
 
         <h3>2.2 登录</h3>
@@ -243,7 +243,7 @@
             <li>鼠标悬停在消息上，点击右下角 ⭐ 按钮即可收藏</li>
             <li>收藏的消息在「我的收藏」页面查看</li>
             <li>支持删除收藏</li>
-            <li>数据存储：GitHub Issues（label: <code>favorite</code>）</li>
+            <li>数据存储：Cloudflare D1（表: favorite）</li>
         </ul>
 
         <h3>3.7 消息搜索（search.html）</h3>
@@ -336,7 +336,7 @@
             <li>系统自动验证用户是否存在</li>
             <li>不可添加自己或 AI 小助手为好友</li>
             <li>不可重复添加已添加的好友</li>
-            <li>数据存储：GitHub Issues（label: <code>friend</code>）</li>
+            <li>数据存储：Cloudflare D1（表: friend）</li>
         </ul>
 
         <h3>5.2 好友列表</h3>
@@ -416,7 +416,7 @@
             <li>支持编写/预览双标签页</li>
             <li>删除公告</li>
             <li>公告按时间倒序排列</li>
-            <li>数据存储：GitHub Issues（label: <code>notice</code>）</li>
+            <li>数据存储：Cloudflare D1（表: notice）</li>
         </ul>
 
         <h3>7.4 建议审核（admin-suggestions.html）</h3>
@@ -424,7 +424,7 @@
             <li>查看用户提交的建议</li>
             <li>更新建议状态：待审核、处理中、已完成、已驳回</li>
             <li>添加备注说明</li>
-            <li>数据存储：GitHub Issues（label: <code>suggestion</code>）</li>
+            <li>数据存储：Cloudflare D1（表: suggestion）</li>
         </ul>
     </div>
 
@@ -507,7 +507,7 @@
             <li>建议状态：待审核、处理中、已完成、已驳回</li>
             <li>所有用户可查看已提交的建议及处理状态</li>
             <li>建议按提交时间倒序排列</li>
-            <li>数据存储：GitHub Issues（label: <code>suggestion</code>）</li>
+            <li>数据存储：Cloudflare D1（表: suggestion）</li>
         </ul>
     </div>
 
@@ -615,7 +615,7 @@
 
         <h3>数据相关</h3>
         <ul>
-            <li><strong>数据保存在哪里？</strong> 所有数据保存在 GitHub Issues 中，完全透明。</li>
+            <li><strong>数据保存在哪里？</strong> 所有数据保存在 Cloudflare D1 中，安全可控。</li>
             <li><strong>导出聊天记录？</strong> 点击导航栏「📤 导出」，选择导出范围和格式。</li>
         </ul>
 
@@ -623,7 +623,7 @@
         <ul>
             <li><strong>免费吗？</strong> 完全免费。</li>
             <li><strong>支持移动端？</strong> 支持响应式设计。</li>
-            <li><strong>为什么卡？</strong> 基于 GitHub API，网络延迟或速率限制可能导致卡顿。</li>
+            <li><strong>为什么卡？</strong> 基于 Cloudflare Workers，网络延迟可能导致卡顿。</li>
             <li><strong>有桌面版？</strong> 有 Windows 桌面版（v2.3.0）和 Android APK。</li>
         </ul>
     </div>
@@ -704,10 +704,80 @@
     </div>
 
     <!-- ============================================================ -->
-    <!--  十六、联系管理员                                                -->
+    <!--  十七、扩展功能                                                -->
     <!-- ============================================================ -->
     <div class="section">
-        <h2>📧 十六、联系管理员</h2>
+        <h2>🧩 十七、扩展功能</h2>
+        <p>除核心聊天外，NFLSHC Chat 还提供以下独立功能模块，所有数据均通过 Cloudflare D1 存储。</p>
+
+        <h3>📅 日历 / 课程表（calendar.html）</h3>
+        <ul>
+            <li>查看课程表与日历安排，支持周 / 月视图</li>
+            <li>点击日期查看当日课程与事件</li>
+            <li>数据存储：Cloudflare D1（表: calendar）</li>
+        </ul>
+
+        <h3>🗳️ 投票中心（polls.html）</h3>
+        <ul>
+            <li>发起单 / 多选投票，实时查看结果与参与人数</li>
+            <li>查看历史投票记录</li>
+            <li>数据存储：Cloudflare D1（表: poll）</li>
+        </ul>
+
+        <h3>📝 帖子 / 动态（posts.html）</h3>
+        <ul>
+            <li>发布图文动态，支持 Markdown</li>
+            <li>点赞、评论与互动</li>
+            <li>数据存储：Cloudflare D1（表: post）</li>
+        </ul>
+
+        <h3>📰 文章（articles.html）</h3>
+        <ul>
+            <li>发布长文文章，按分类浏览与搜索</li>
+            <li>支持收藏与分享</li>
+            <li>数据存储：Cloudflare D1（表: article）</li>
+        </ul>
+
+        <h3>🎵 音乐（music.html / music-play.html / music-make.html）</h3>
+        <ul>
+            <li>在线音乐播放与歌单管理</li>
+            <li>音乐播放器与简单音乐创作</li>
+            <li>数据存储：Cloudflare D1（表: music）</li>
+        </ul>
+
+        <h3>🎮 词语游戏（word-game.html）</h3>
+        <ul>
+            <li>文字 / 词语类益智小游戏</li>
+            <li>记录得分与排行榜</li>
+            <li>数据存储：Cloudflare D1（表: wordgame）</li>
+        </ul>
+
+        <h3>🚩 举报中心（report.html）</h3>
+        <ul>
+            <li>对违规内容或用户提交举报，填写原因</li>
+            <li>管理员在后台处理举报</li>
+            <li>数据存储：Cloudflare D1（表: report）</li>
+        </ul>
+
+        <h3>🎨 主题设置（theme.html）</h3>
+        <ul>
+            <li>切换多套界面主题（含 5 套主题样式）</li>
+            <li>实时预览，设置随账号同步保存</li>
+            <li>数据存储：Cloudflare D1（表: theme）</li>
+        </ul>
+
+        <h3>🔗 HZYAI 对话分享（hzyai-share.html）</h3>
+        <ul>
+            <li>将 HZYAI 的对话内容生成分享卡片</li>
+            <li>支持复制链接或导出分享</li>
+        </ul>
+    </div>
+
+    <!-- ============================================================ -->
+    <!--  十八、联系管理员                                                -->
+    <!-- ============================================================ -->
+    <div class="section">
+        <h2>📧 十八、联系管理员</h2>
         <p><strong>用户名：</strong>huangzhiyuan</p>
         <p><strong>联系方式：</strong>在主站创建与 huangzhiyuan 的私聊房间。</p>
     </div>
@@ -717,7 +787,7 @@
     <!-- ============================================================ -->
     <div class="footer">
         <p>📚 NFLSHC Chat · RAG 知识库 v1.0</p>
-        <p>为 HZYAI LLM 提供结构化知识检索 · 基于 GitHub Issues 构建</p>
+        <p>为 HZYAI LLM 提供结构化知识检索 · 基于 Cloudflare D1 构建</p>
         <p style="margin-top:4px; color:#444;">© 2026 NFLSHC 202401 社区</p>
     </div>
 
