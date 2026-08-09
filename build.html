@@ -164,7 +164,7 @@
 <div class="container">
 
     <h1>🚀 从零搭建聊天×AI 网站</h1>
-    <p class="subtitle">使用 GitHub Pages + GitHub Issues + 浏览器 AI 能力 · 零服务器成本</p>
+    <p class="subtitle">使用 Cloudflare Pages + Cloudflare Workers + Cloudflare D1 + 浏览器 AI 能力 · 零服务器成本</p>
 
     <!-- ===== 目录 ===== -->
     <div class="toc">
@@ -236,13 +236,16 @@
 📁 my-chat-app/
 ├── 📄 index.html          # 登录/首页
 ├── 📄 chat.html           # 聊天主页面（核心）
-├── 📄 config.js           # GitHub 配置（包含 Token）
+├── 📄 config.js           # Cloudflare Worker 配置（API 地址）
+├── 📄 worker.js           # Cloudflare Worker（D1 读写 + 兼容层）
+├── 📄 wrangler.toml       # Worker / D1 部署配置
 ├── 📄 style.css           # 样式文件
 └── 📄 README.md           # 项目说明（可选）
         </div>
         <div class="tip">💡 <strong>核心文件说明：</strong><br>
-        <code>config.js</code> — 存储你的 GitHub 用户名、仓库名、Token<br>
+        <code>config.js</code> — 存储你的 Cloudflare Worker API 地址<br>
         <code>chat.html</code> — 所有聊天逻辑（发送消息、加载消息、AI 对话）<br>
+        <code>worker.js</code> — 服务端：调用 Cloudflare D1 数据库读写数据<br>
         <code>index.html</code> — 用户登录入口</div>
     </div>
 
@@ -251,13 +254,11 @@
         <h2>5. 核心代码详解 <span class="badge">第五步</span></h2>
 
         <h3>5.1 config.js — 配置文件</h3>
-        <p>将以下代码复制到 <code>config.js</code> 中，替换成你的信息：</p>
+        <p>将以下代码复制到 <code>config.js</code> 中，替换成你的 Cloudflare Worker 地址：</p>
         <div class="code-block" id="configCode">
-<span class="comment">// config.js — 请替换成你的信息</span>
+<span class="comment">// config.js — 请替换成你的 Cloudflare Worker 地址</span>
 window.CONFIG = {
-    GITHUB_USERNAME: '<span style="color:#34d399;">你的GitHub用户名</span>',
-    GITHUB_REPO: '<span style="color:#34d399;">你的仓库名</span>',
-    GITHUB_TOKEN: '<span style="color:#34d399;">你的Personal Access Token</span>'
+    WORKER_API: '<span style="color:#34d399;">https://你的子域.workers.dev</span>'
 };
         </div>
         <button class="btn-copy" onclick="copyCode('configCode')">📋 复制</button>
@@ -270,11 +271,9 @@ async function login() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     
-    <span class="comment">// 从 GitHub Issues 读取用户数据</span>
-    const url = `https://api.github.com/repos/${window.CONFIG.GITHUB_USERNAME}/${window.CONFIG.GITHUB_REPO}/issues?labels=user&state=open`;
-    const res = await fetch(url, {
-        headers: { 'Authorization': `token ${window.CONFIG.GITHUB_TOKEN}` }
-    });
+    <span class="comment">// 通过 Cloudflare Worker 兼容层读取 user 表数据</span>
+    const url = `${window.CONFIG.WORKER_API}/api/legacy/issues?labels=user&state=open`;
+    const res = await fetch(url);
     const issues = await res.json();
     
     <span class="comment">// 查找匹配的用户</span>
@@ -297,7 +296,7 @@ async function login() {
 
         <h3>5.3 发送消息 (chat.html 核心)</h3>
         <div class="code-block" id="sendCode">
-<span class="comment">// chat.html — 发送消息到 GitHub Issues</span>
+<span class="comment">// chat.html — 通过 Cloudflare Worker 写入 D1 消息表</span>
 async function sendMessage() {
     const input = document.getElementById('messageInput');
     const content = input.value.trim();
@@ -305,25 +304,17 @@ async function sendMessage() {
     
     const messageData = {
         id: `msg_${Date.now()}`,
-        roomId: currentRoom.id,
+        room_id: currentRoom.id,
         sender: currentUser.username,
         content: content,
         timestamp: new Date().toISOString()
     };
     
-    <span class="comment">// 存储到 GitHub Issues</span>
-    const issueBody = `聊天消息\n\`\`\`json\n${JSON.stringify(messageData, null, 2)}\n\`\`\``;
-    await fetch(`https://api.github.com/repos/${window.CONFIG.GITHUB_USERNAME}/${window.CONFIG.GITHUB_REPO}/issues`, {
+    <span class="comment">// 直接写入 Cloudflare D1（messages 表）</span>
+    await fetch(`${window.CONFIG.WORKER_API}/api/messages`, {
         method: 'POST',
-        headers: {
-            'Authorization': `token ${window.CONFIG.GITHUB_TOKEN}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            title: `Message: ${messageData.id}`,
-            body: issueBody,
-            labels: ['chatmessage']
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(messageData)
     });
     
     input.value = '';
@@ -332,27 +323,14 @@ async function sendMessage() {
         </div>
         <button class="btn-copy" onclick="copyCode('sendCode')">📋 复制</button>
 
-        <h3>5.4 加载消息 (chat.html 核心)</h3>
+        <h3>5.4 加载消息 (chat.html 核心) — Cloudflare Worker</h3>
         <div class="code-block" id="loadCode">
-<span class="comment">// chat.html — 从 GitHub Issues 加载消息</span>
+<span class="comment">// chat.html — 从 Cloudflare Worker (D1) 加载消息</span>
 async function loadMessages() {
-    const url = `https://api.github.com/repos/${window.CONFIG.GITHUB_USERNAME}/${window.CONFIG.GITHUB_REPO}/issues?labels=chatmessage&state=open`;
-    const res = await fetch(url, {
-        headers: { 'Authorization': `token ${window.CONFIG.GITHUB_TOKEN}` }
-    });
-    const issues = await res.json();
-    
-    const messages = [];
-    for (const issue of issues) {
-        const match = issue.body.match(/```json\n([\s\S]*?)\n```/);
-        if (match) {
-            const msg = JSON.parse(match[1]);
-            <span class="comment">// 只显示当前聊天室的消息</span>
-            if (msg.roomId === currentRoom.id) {
-                messages.push(msg);
-            }
-        }
-    }
+    <span class="comment">// GET /api/messages?room_id=xxx 直接从 D1 查询消息表</span>
+    const url = `${window.CONFIG.WORKER_API}/api/messages?room_id=${encodeURIComponent(currentRoom.id)}`;
+    const res = await fetch(url);
+    const messages = await res.json();   <span class="comment">// D1 返回的原始消息数组</span>
     
     <span class="comment">// 按时间排序</span>
     messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
@@ -387,18 +365,16 @@ async function loadMessages() {
 
     <!-- ===== STEP 6 ===== -->
     <div class="step" id="step6">
-        <h2>6. 部署到 GitHub Pages <span class="badge">第六步</span></h2>
-        <p>将你的代码推送到 GitHub，然后启用 Pages 服务。</p>
+        <h2>6. 部署到 Cloudflare <span class="badge">第六步</span></h2>
+        <p>前端静态页面托管到 Cloudflare Pages，数据接口由 Cloudflare Worker + D1 提供。</p>
         <ol>
-            <li><strong>创建文件：</strong>在仓库中点击 <strong>Add file</strong> → <strong>Create new file</strong></li>
-            <li><strong>上传代码：</strong>分别创建 <code>index.html</code>、<code>chat.html</code>、<code>config.js</code></li>
-            <li>点击 <strong>Commit new file</strong></li>
-            <li>进入仓库 <strong>Settings</strong> → <strong>Pages</strong></li>
-            <li>在 <strong>Branch</strong> 下选择 <code>main</code>，点击 <strong>Save</strong></li>
-            <li>等待 1-2 分钟，页面顶部会显示 <code>https://你的用户名.github.io/你的仓库名/</code></li>
+            <li><strong>部署 Worker：</strong>在 <code>wrangler.toml</code> 中配置 D1 绑定后运行 <code>wrangler deploy</code></li>
+            <li><strong>得到 Worker 地址：</strong>记下形如 <code>https://你的子域.workers.dev</code> 的地址，填入 <code>config.js</code> 的 <code>WORKER_API</code></li>
+            <li><strong>部署前端：</strong>将 <code>index.html</code>、<code>chat.html</code>、<code>config.js</code> 等上传到 Cloudflare Pages（可直接连接 Git 仓库自动部署）</li>
+            <li>等待 1-2 分钟，即可通过 Pages 地址访问你的网站</li>
         </ol>
         <div class="success">✅ <strong>部署成功！</strong> 现在所有人都可以通过这个链接访问你的网站了。</div>
-        <div class="tip">💡 <strong>自动部署：</strong>每次推送到 main 分支，GitHub Pages 会自动更新网站。</div>
+        <div class="tip">💡 <strong>自动部署：</strong>Cloudflare Pages 连接 Git 仓库后，每次推送都会自动更新网站。</div>
     </div>
 
     <!-- ===== STEP 7 ===== -->
@@ -568,7 +544,7 @@ function startVoiceInput() {
     <!-- ===== 页脚 ===== -->
     <div class="footer">
         <p>📚 NFLSHC 202401 · 从零搭建聊天×AI 网站</p>
-        <p style="margin-top:4px; color:#444;">基于 GitHub Pages + GitHub Issues + 思知 AI · 完全免费</p>
+        <p style="margin-top:4px; color:#444;">基于 Cloudflare Pages + Cloudflare Workers + Cloudflare D1 + 思知 AI · 完全免费</p>
     </div>
 
 </div>
