@@ -1,3 +1,5 @@
+**简体中文** | [English](README.en.md)
+
 # help-nflshc202401
 
 NFLSHC 202401 社区项目 **帮助站**（NFLSHC Chat 官方文档与教程站点）。
